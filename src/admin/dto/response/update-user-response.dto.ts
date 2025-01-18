@@ -9,7 +9,7 @@ export class UpdateUserResponseDto {
     generation: number;
     profilePictureUri: string | null;
 
-    Constructor(id: number, email: string, role: UserRoleEnum, grade: number, classNum: number, generation: number, profilePictureUri: string | null) {
+    constructor(id: number, email: string, role: UserRoleEnum, grade: number, classNum: number, generation: number, profilePictureUri: string | null) {
         this.id = id;
         this.email = email;
         this.role = role;

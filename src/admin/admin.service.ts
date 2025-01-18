@@ -15,7 +15,8 @@ export class AdminService {
         private readonly userRepository: UserRepository,
         private readonly scrapRepository: ScrapRepository,
         private readonly securityBcryptService: SecurityBcryptService
-    ) {}
+    ) {
+    }
 
     async findAllUsers(): Promise<FindUsersResponseDto[]> {
         return this.userRepository.findAll().then((value) => {
@@ -36,7 +37,7 @@ export class AdminService {
             profilePictureUri: null,
             banned: false,
         });
-        const createResult:UserEntity = await this.userRepository.createAndSave(user);
+        const createResult: UserEntity = await this.userRepository.createAndSave(user);
         if (!await this.scrapRepository.createAndSave(await this.userRepository.findOneById(createResult.id))) {
             throw new Error("Failed to create scrap");
         }
@@ -44,8 +45,11 @@ export class AdminService {
     }
 
     async updateUserInfo(id: number, data: Partial<UpdateUserRequestDto>): Promise<UpdateUserResponseDto> {
+        if (data.password) {
+            data.password = await this.securityBcryptService.hashPassword(data.password);
+        }
         const user = await this.userRepository.updateById(id, data);
-        return UpdateUserResponseDto.apply(user);
+        return new UpdateUserResponseDto(user.id, user.email, user.role, user.grade, user.classNum, user.generation, user.profilePictureUri);
     }
 
     async updateBannedStatus(id: number, banned: boolean): Promise<UserEntity> {
