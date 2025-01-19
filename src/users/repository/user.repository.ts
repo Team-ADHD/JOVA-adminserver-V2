@@ -50,11 +50,39 @@ export class UserRepository extends Repository<UserEntity> {
 
     public async updateById(id: number, data: Partial<UserEntity>): Promise<UserEntity> {
         const user = await this.findOneById(id);
+        console.log(user.banned);
         if (!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
-        Object.assign(user, data);
-        return this.save(user);
+        const beforeUserStatus = user.banned;
+        if (data.email) {
+            user.email = data.email;
+        }
+        if (data.password) {
+            user.password = data.password;
+        }
+        if (data.role) {
+            user.role = data.role;
+        }
+        if (data.grade) {
+            user.grade = data.grade;
+        }
+        if (data.classNum) {
+            user.classNum = data.classNum;
+        }
+        if (data.generation) {
+            user.generation = data.generation;
+        }
+        if (data.profilePictureUri) {
+            user.profilePictureUri = data.profilePictureUri;
+        }
+        if (beforeUserStatus !== user.banned) {
+            user.banned = beforeUserStatus;
+        }
+        if(await this.findOneByGradeClassAndGeneration(user.grade, user.classNum, user.generation)) {
+            throw new AlreadyUserException("User with the same grade, class, and generation already exists");
+        }
+        return await this.save(user);
     }
 
     public async updateBannedStatusById(id: number, banned: boolean): Promise<UserEntity> {
@@ -63,6 +91,6 @@ export class UserRepository extends Repository<UserEntity> {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
         user.banned = banned;
-        return this.save(user);
+        return await this.save(user);
     }
 }
