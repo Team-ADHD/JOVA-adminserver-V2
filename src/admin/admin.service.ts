@@ -20,7 +20,7 @@ export class AdminService {
 
     async findAllUsers(): Promise<FindUsersResponseDto[]> {
         return this.userRepository.findAll().then((value) => {
-            return value.map((user) => FindUsersResponseDto.apply(user));
+            return value.map((user) => new FindUsersResponseDto(user.id, user.email, user.role, user.grade, user.classNum, user.generation, user.profilePictureUri, user.banned));
         });
     }
 
@@ -49,10 +49,11 @@ export class AdminService {
             data.password = await this.securityBcryptService.hashPassword(data.password);
         }
         const user = await this.userRepository.updateById(id, data);
-        return new UpdateUserResponseDto(user.id, user.email, user.role, user.grade, user.classNum, user.generation, user.profilePictureUri);
+        return new UpdateUserResponseDto(user.id, user.email, user.role, user.grade, user.classNum, user.generation, user.profilePictureUri, user.banned);
     }
 
-    async updateBannedStatus(id: number, banned: boolean): Promise<UserEntity> {
-        return this.userRepository.updateBannedStatusById(id, banned);
+    async updateBannedStatus(id: number, banned: boolean): Promise<UpdateUserResponseDto> {
+        const user = await this.userRepository.updateBannedStatusById(id, banned);
+        return new UpdateUserResponseDto(user.id, user.email, user.role, user.grade, user.classNum, user.generation, user.profilePictureUri, user.banned);
     }
 }
