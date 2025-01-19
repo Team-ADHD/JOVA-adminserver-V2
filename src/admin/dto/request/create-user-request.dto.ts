@@ -8,7 +8,7 @@ export class CreateUserRequestDto {
     @MaxLength(50, {message: 'Email must be at most 50 characters long'})
     @IsNotEmpty({message: 'Email must be provided'})
     email: string;
-    @IsString()
+    @IsString({message: 'Password must be a string'})
     @MinLength(6, {message: 'Password must be at least 6 characters long'})
     @MaxLength(100, {message: 'Password must be at most 100 characters long'})
     @IsNotEmpty({message: 'Password must be provided'})
@@ -18,6 +18,8 @@ export class CreateUserRequestDto {
     role: UserRoleEnum;
     @IsInt({message: 'Grade must be an integer'})
     @IsNotEmpty({message: 'Grade must be provided'})
+    @Max(4, {message: 'Grade must be at most 4'})
+    @Min(1, {message: 'Grade must be at least 1'})
     grade: number;
     @IsInt({message: 'Class number must be an integer'})
     @IsNotEmpty({message: 'Class number must be provided'})
