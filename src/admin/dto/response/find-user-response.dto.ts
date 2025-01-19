@@ -1,6 +1,7 @@
 import {UserRoleEnum} from "../../../users/enums/user.role.enum";
 
 export class FindUsersResponseDto {
+
     id: number;
     email: string;
     role: UserRoleEnum;
@@ -8,8 +9,9 @@ export class FindUsersResponseDto {
     classNum: number;
     generation: number;
     profilePictureUri: string | null;
+    banned: boolean;
 
-    Constructor(id: number, email: string, role: UserRoleEnum, grade: number, classNum: number, generation: number, profilePictureUri: string | null) {
+    constructor(id: number, email: string, role: UserRoleEnum, grade: number, classNum: number, generation: number, profilePictureUri: string | null, banned: boolean) {
         this.id = id;
         this.email = email;
         this.role = role;
@@ -17,5 +19,6 @@ export class FindUsersResponseDto {
         this.classNum = classNum;
         this.generation = generation;
         this.profilePictureUri = profilePictureUri;
+        this.banned = banned;
     }
 }
