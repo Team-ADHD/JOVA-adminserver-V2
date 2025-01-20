@@ -1,6 +1,6 @@
 import {UserRoleEnum} from "../../../users/enums/user.role.enum";
 
-export class FindUsersResponseDto {
+export class FindUserResponseDto {
 
     id: number;
     email: string;
