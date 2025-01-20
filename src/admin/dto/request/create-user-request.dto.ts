@@ -18,7 +18,7 @@ export class CreateUserRequestDto {
     role: UserRoleEnum;
     @IsInt({message: 'Grade must be an integer'})
     @IsNotEmpty({message: 'Grade must be provided'})
-    @Max(4, {message: 'Grade must be at most 4'})
+    @Max(3, {message: 'Grade must be at most 3'})
     @Min(1, {message: 'Grade must be at least 1'})
     grade: number;
     @IsInt({message: 'Class number must be an integer'})

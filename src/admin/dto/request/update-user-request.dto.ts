@@ -17,7 +17,7 @@ export class UpdateUserRequestDto {
     role?: UserRoleEnum;
     @ValidateIf((o) => o.grade !== undefined)
     @IsInt({message: 'Grade must be an integer'})
-    @Max(4, {message: 'Grade must be at most 4'})
+    @Max(3, {message: 'Grade must be at most 3'})
     @Min(1, {message: 'Grade must be at least 1'})
     grade?: number;
     @ValidateIf((o) => o.classNum !== undefined)
