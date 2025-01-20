@@ -2,6 +2,7 @@ import {Injectable, NotFoundException} from '@nestjs/common';
 import {DataSource, Repository} from 'typeorm';
 import {UserEntity} from '../entities/user.entity';
 import {AlreadyUserException} from "../../admin/exception/already-user.exception";
+import {UserRoleEnum} from "../enums/user.role.enum";
 
 @Injectable()
 export class UserRepository extends Repository<UserEntity> {
@@ -29,9 +30,30 @@ export class UserRepository extends Repository<UserEntity> {
         return this.find();
     }
 
-    public async findAllPaginated(page: number, limit: number): Promise<UserEntity[]> {
+    public async findSearchAndPaginate(
+        offset: number,
+        limit: number,
+        sortField: string,
+        sortOrder: 'asc' | 'desc',
+        generation?: number,
+        grade?: number,
+        classNum?: number,
+        banned?: boolean,
+        role?: UserRoleEnum,
+    ): Promise<UserEntity[]> {
+        const where: any = {};
+        if (generation !== undefined) where.generation = generation;
+        if (grade !== undefined) where.grade = grade;
+        if (classNum !== undefined) where.classNum = classNum;
+        if (banned !== undefined) where.banned = banned;
+        if (role !== undefined) where.role = role;
+        console.log('Generated WHERE clause:', where);
         return this.find({
-            skip: (page - 1) * limit,
+            where,
+            order: {
+                [sortField]: sortOrder,
+            },
+            skip: offset,
             take: limit,
         });
     }
@@ -79,7 +101,7 @@ export class UserRepository extends Repository<UserEntity> {
         if (beforeUserStatus !== user.banned) {
             user.banned = beforeUserStatus;
         }
-        if(await this.findOneByGradeClassAndGeneration(user.grade, user.classNum, user.generation)) {
+        if (await this.findOneByGradeClassAndGeneration(user.grade, user.classNum, user.generation)) {
             throw new AlreadyUserException("User with the same grade, class, and generation already exists");
         }
         return await this.save(user);

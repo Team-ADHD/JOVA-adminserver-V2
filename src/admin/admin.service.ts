@@ -4,10 +4,11 @@ import {UserEntity} from "../users/entities/user.entity";
 import {UpdateUserRequestDto} from "./dto/request/update-user-request.dto";
 import {CreateUserRequestDto} from "./dto/request/create-user-request.dto";
 import {CreateUserResponseDto} from "./dto/response/create-user-response.dto";
-import {FindUsersResponseDto} from "./dto/response/find-user-response.dto";
+import {FindUserResponseDto} from "./dto/response/find-user-response.dto";
 import {UpdateUserResponseDto} from "./dto/response/update-user-response.dto";
 import {SecurityBcryptService} from "../security/security.bcrypt.service";
 import {ScrapRepository} from "../scrap/repository/scrap.repository";
+import {FindUserRequestDto} from "./dto/request/find-user-request.dto";
 
 @Injectable()
 export class AdminService {
@@ -18,16 +19,55 @@ export class AdminService {
     ) {
     }
 
-    async findAllUsers(): Promise<FindUsersResponseDto[]> {
+    async findAllUsers(): Promise<FindUserResponseDto[]> {
         return this.userRepository.findAll().then((value) => {
-            return value.map((user) => new FindUsersResponseDto(user.id, user.email, user.role, user.grade, user.classNum, user.generation, user.profilePictureUri, user.banned));
+            return value.map((user) => new FindUserResponseDto(user.id, user.email, user.role, user.grade, user.classNum, user.generation, user.profilePictureUri, user.banned));
         });
     }
 
-    async findPaginatedUsers(page: number, limit: number): Promise<FindUsersResponseDto[]> {
-        return this.userRepository.findAllPaginated(page, limit).then((value) => {
-            return value.map((user) => FindUsersResponseDto.apply(user));
-        });
+    async findSearchUsers(query: FindUserRequestDto): Promise<FindUserResponseDto[]> {
+        const {
+            page,
+            offset,
+            limit,
+            sortField,
+            sortOrder,
+            generation,
+            grade,
+            classNum,
+            banned,
+            role,
+        } = query;
+        const calculatedOffset = offset ?? (page - 1) * limit;
+        const validSortFields = ['id', 'email', 'grade', 'classNum', 'generation', 'banned'];
+        if (!validSortFields.includes(sortField)) {
+            throw new Error(`Invalid sort field: ${sortField}`);
+        }
+
+        const users = await this.userRepository.findSearchAndPaginate(
+            calculatedOffset,
+            limit,
+            sortField,
+            sortOrder,
+            generation,
+            grade,
+            classNum,
+            banned,
+            role,
+        );
+
+        return users.map((user) =>
+            new FindUserResponseDto(
+                user.id,
+                user.email,
+                user.role,
+                user.grade,
+                user.classNum,
+                user.generation,
+                user.profilePictureUri,
+                user.banned,
+            ),
+        );
     }
 
     async createUser(createUserDTO: CreateUserRequestDto): Promise<CreateUserResponseDto> {
