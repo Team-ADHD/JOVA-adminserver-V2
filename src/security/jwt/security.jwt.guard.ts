@@ -72,7 +72,12 @@ export class SecurityJwtGuard implements CanActivate {
 
   private async fetchTimeFromApi(url: string): Promise<number | null> {
     try {
-      const response = await fetch(url, { timeout: 10000 });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => {
+        controller.abort();
+      }, 10000);
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
       if (!response.ok) {
         console.error(`API request failed: ${response.statusText}`);
         return null;
