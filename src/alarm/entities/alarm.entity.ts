@@ -1,17 +1,14 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from '../../users/entities/user.entity';
-import { AlarmStatusEnum } from '../enums/alarm.status.enum';
-import { AlarmContent } from '../dto/alarm.content';
+import { AlarmContentEntity } from './alarm.content.entity';
 
 @Entity('alarms')
-export class Alarm {
+export class AlarmEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  @OneToOne(() => UserEntity)
+  @OneToOne(() => UserEntity, { cascade: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
-  @Column({ name: 'alarm_status', type: 'enum', enum: AlarmStatusEnum, nullable: false })
-  alarmStatus: AlarmStatusEnum;
-  @Column(() => AlarmContent)
-  alarmContent: AlarmContent;
+  @OneToMany(() => AlarmContentEntity, (content) => content.alarm, { cascade: true })
+  alarmContents: AlarmContentEntity[];
 }
