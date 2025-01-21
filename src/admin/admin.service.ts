@@ -9,12 +9,14 @@ import { UpdateUserResponseDto } from './dto/response/update-user-response.dto';
 import { SecurityBcryptService } from '../security/security.bcrypt.service';
 import { ScrapRepository } from '../scrap/repository/scrap.repository';
 import { FindUserRequestDto } from './dto/request/find-user-request.dto';
+import { AlarmRepository } from '../alarm/repository/alarm.repository';
 
 @Injectable()
 export class AdminService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly scrapRepository: ScrapRepository,
+    private readonly alarmRepository: AlarmRepository,
     private readonly securityBcryptService: SecurityBcryptService,
   ) {
   }
@@ -78,8 +80,11 @@ export class AdminService {
       banned: false,
     });
     const createResult: UserEntity = await this.userRepository.createAndSave(user);
-    if (!await this.scrapRepository.createAndSave(await this.userRepository.findOneById(createResult.id))) {
+    if (!await this.scrapRepository.createAndSave(createResult)) {
       throw new Error('Failed to create scrap');
+    }
+    if (!await this.alarmRepository.createAndSave(createResult)) {
+      throw new Error('Failed to create alarm');
     }
     return new CreateUserResponseDto(createResult.id, createResult.email, createResult.role, createResult.grade, createResult.classNum, createResult.generation, createResult.profilePictureUri);
   }
