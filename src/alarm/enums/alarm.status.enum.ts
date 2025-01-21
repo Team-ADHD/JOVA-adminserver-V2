@@ -1,5 +1,5 @@
 export enum AlarmStatusEnum {
-    ACTIVE = 'ACTIVE',
-    INACTIVE = 'INACTIVE',
-    HIDDEN = 'HIDDEN',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  HIDDEN = 'HIDDEN',
 }

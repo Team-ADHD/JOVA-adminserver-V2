@@ -1,21 +1,21 @@
-import {Module} from '@nestjs/common';
-import {AdminController} from './admin.controller';
-import {AdminService} from './admin.service';
-import {UserRepository} from "../users/repository/user.repository";
-import {TypeOrmModule} from "@nestjs/typeorm";
-import {UserEntity} from "../users/entities/user.entity";
-import {SecurityBcryptService} from "../security/security.bcrypt.service";
-import {ScrapRepository} from "../scrap/repository/scrap.repository";
-import {SecurityJwtModule} from "../security/jwt/security.jwt.module";
-import {SecurityJwtGuard} from "../security/jwt/security.jwt.guard";
+import { Module } from '@nestjs/common';
+import { AdminController } from './admin.controller';
+import { AdminService } from './admin.service';
+import { UserRepository } from '../users/repository/user.repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from '../users/entities/user.entity';
+import { SecurityBcryptService } from '../security/security.bcrypt.service';
+import { ScrapRepository } from '../scrap/repository/scrap.repository';
+import { SecurityJwtModule } from '../security/jwt/security.jwt.module';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([UserEntity]),
-        SecurityJwtModule,
-    ],
-    controllers: [AdminController],
-    providers: [AdminService, UserRepository, ScrapRepository, SecurityBcryptService],
-    exports: [SecurityBcryptService],
+  imports: [
+    TypeOrmModule.forFeature([UserEntity]),
+    SecurityJwtModule,
+  ],
+  controllers: [AdminController],
+  providers: [AdminService, UserRepository, ScrapRepository, SecurityBcryptService],
+  exports: [SecurityBcryptService],
 })
-export class AdminModule {}
+export class AdminModule {
+}
