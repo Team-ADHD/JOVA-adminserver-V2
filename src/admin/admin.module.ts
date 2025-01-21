@@ -7,6 +7,7 @@ import { UserEntity } from '../users/entities/user.entity';
 import { SecurityBcryptService } from '../security/security.bcrypt.service';
 import { ScrapRepository } from '../scrap/repository/scrap.repository';
 import { SecurityJwtModule } from '../security/jwt/security.jwt.module';
+import { AlarmRepository } from '../alarm/repository/alarm.repository';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { SecurityJwtModule } from '../security/jwt/security.jwt.module';
     SecurityJwtModule,
   ],
   controllers: [AdminController],
-  providers: [AdminService, UserRepository, ScrapRepository, SecurityBcryptService],
+  providers: [AdminService, UserRepository, ScrapRepository, AlarmRepository, SecurityBcryptService],
   exports: [SecurityBcryptService],
 })
 export class AdminModule {
