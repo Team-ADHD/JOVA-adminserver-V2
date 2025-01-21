@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Patch, Post, Query} from '@nestjs/common';
+import {Body, Controller, Get, Param, Patch, Post, Query, UseGuards} from '@nestjs/common';
 import {AdminService} from "./admin.service";
 import {CreateUserRequestDto} from "./dto/request/create-user-request.dto";
 import {plainToInstance} from "class-transformer";
@@ -8,7 +8,9 @@ import {UpdateUserResponseDto} from "./dto/response/update-user-response.dto";
 import {FindUserResponseDto} from "./dto/response/find-user-response.dto";
 import {UpdateUserStatusRequestDto} from "./dto/request/update-user-status-request.dto";
 import {FindUserRequestDto} from "./dto/request/find-user-request.dto";
+import {SecurityJwtGuard} from "../security/jwt/security.jwt.guard";
 
+@UseGuards(SecurityJwtGuard)
 @Controller('admin')
 export class AdminController {
     constructor(private readonly adminService: AdminService) {
