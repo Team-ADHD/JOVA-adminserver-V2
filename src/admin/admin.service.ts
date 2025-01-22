@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { UserRepository } from '../users/repository/user.repository';
 import { UserEntity } from '../users/entities/user.entity';
 import { UpdateUserRequestDto } from './dto/request/update-user-request.dto';
@@ -13,6 +13,9 @@ import { AlarmRepository } from '../alarm/repository/alarm.repository';
 
 @Injectable()
 export class AdminService {
+
+  private readonly logger = new Logger(AdminService.name);
+
   constructor(
     private readonly userRepository: UserRepository,
     private readonly scrapRepository: ScrapRepository,
@@ -23,6 +26,7 @@ export class AdminService {
 
   async findAllUsers(): Promise<FindUserResponseDto[]> {
     return this.userRepository.findAll().then((value) => {
+      this.logger.warn(`Found All Users: ${value.length}`);
       return value.map((user) => new FindUserResponseDto(user.id, user.email, user.role, user.grade, user.classNum, user.generation, user.profilePictureUri, user.banned));
     });
   }
@@ -45,7 +49,6 @@ export class AdminService {
     if (!validSortFields.includes(sortField)) {
       throw new Error(`Invalid sort field: ${sortField}`);
     }
-
     const users = await this.userRepository.findSearchAndPaginate(
       calculatedOffset,
       limit,
@@ -57,7 +60,7 @@ export class AdminService {
       banned,
       role,
     );
-
+    this.logger.log(`Search Users: ${users.length}`);
     return users.map((user) =>
       new FindUserResponseDto(
         user.id,
@@ -86,6 +89,7 @@ export class AdminService {
     if (!await this.alarmRepository.createAndSave(createResult)) {
       throw new Error('Failed to create alarm');
     }
+    this.logger.log(`Created user: Email: ${createResult.email} | UUID: ${createResult.UUID} | Role: ${createResult.role}`);
     return new CreateUserResponseDto(createResult.id, createResult.email, createResult.role, createResult.grade, createResult.classNum, createResult.generation, createResult.profilePictureUri);
   }
 
@@ -94,11 +98,13 @@ export class AdminService {
       data.password = await this.securityBcryptService.hashPassword(data.password);
     }
     const user = await this.userRepository.updateById(id, data);
+    this.logger.log(`Updated user: Email: ${user.email} | UUID: ${user.UUID} | Role: ${user.role} \n Updated Spot: ${JSON.stringify(data)}`);
     return new UpdateUserResponseDto(user.id, user.email, user.role, user.grade, user.classNum, user.generation, user.profilePictureUri, user.banned);
   }
 
   async updateBannedStatus(id: number, banned: boolean): Promise<UpdateUserResponseDto> {
     const user = await this.userRepository.updateBannedStatusById(id, banned);
+    this.logger.log(`Updated user: Email: ${user.email} | UUID: ${user.UUID} | Role: ${user.role} \n New Banned Status: ${banned}`);
     return new UpdateUserResponseDto(user.id, user.email, user.role, user.grade, user.classNum, user.generation, user.profilePictureUri, user.banned);
   }
 }
